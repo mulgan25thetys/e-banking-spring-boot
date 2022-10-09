@@ -20,9 +20,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import bank.online.entities.User;
+import bank.online.entities.Role;
 import bank.online.payload.request.LoginRequest;
 import bank.online.payload.response.MessageResponse;
 import bank.online.repositories.UserRepository;
+import bank.online.repositories.RoleRepository;
 import bank.online.services.IUserServices;
 
 @RestController
@@ -33,18 +35,45 @@ public class UserController {
 	UserRepository userRepository;
 	
 	@Autowired
+	RoleRepository roleRepository;
+	
+	@Autowired
 	IUserServices userService;
 
-	@PreAuthorize("hasAnyRole('ROLE_RESPONSABLE_OPTION','ROLE_COMITE_ORGANISATION','ROLE_ENSEIGNANT')")
+	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE')")
 	@GetMapping("/list-all")
 	@ResponseBody
 	public List<User> findAll() {
 		return userService.findAll();
 	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH','ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE')")
+	@GetMapping("/get-role-by-name/{role}")
+	@ResponseBody 
+	public Role getRoleByName(@PathVariable("role") String roleName) {
+		return roleRepository.getRoleByName(roleName);
+		
+	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE')")
+	@GetMapping("/list-all-clients")
+	@ResponseBody
+	public List<User> findAllClients() {
+		return userRepository.findAllClients();
+	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH')")
+	@GetMapping("/list-all-personnals")
+	@ResponseBody
+	public List<User> findAllPersonnals() {
+		return userRepository.findAllPersonnals();
+	}
 
 	
 	@SuppressWarnings("all")
-	@PreAuthorize("hasAnyRole('ROLE_RESPONSABLE_OPTION','ROLE_COMITE_ORGANISATION','ROLE_ETUDIANT','ROLE_ENSEIGNANT')")
+	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH',"
+			+ "'ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
+			+ "'ROLE_PERSONNEL_FINANCIER','ROLE_EMPLOYE_CAP','ROLE_CLIENT')")
 	@PutMapping("/edit-user")
 	@ResponseBody
 	public ResponseEntity<Object> editUser(@Valid @RequestBody User usr)
@@ -71,7 +100,9 @@ public class UserController {
 		return ResponseEntity.ok().body(userService.editUser(usr));
 	}
 	
-	@PreAuthorize("hasAnyRole('ROLE_RESPONSABLE_OPTION','ROLE_COMITE_ORGANISATION','ROLE_ETUDIANT','ROLE_ENSEIGNANT')")
+	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH',"
+			+ "'ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
+			+ "'ROLE_PERSONNEL_FINANCIER','ROLE_EMPLOYE_CAP','ROLE_CLIENT')")
 	@PutMapping("/edit-profile/{id}")
 	@ResponseBody
 	public User editProfile(@RequestParam("profile") MultipartFile profile,@PathVariable("id") Long id)
@@ -79,7 +110,9 @@ public class UserController {
 		return userService.editProfile(profile,id);
 	}
 	
-	@PreAuthorize("hasAnyRole('ROLE_RESPONSABLE_OPTION','ROLE_COMITE_ORGANISATION','ROLE_ETUDIANT','ROLE_ENSEIGNANT')")
+	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH',"
+			+ "'ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
+			+ "'ROLE_PERSONNEL_FINANCIER','ROLE_EMPLOYE_CAP','ROLE_CLIENT')")
 	@GetMapping("/get-user/{id}")
 	@ResponseBody
 	public ResponseEntity<Object> getUser(@PathVariable("id") Long id) {
@@ -90,14 +123,18 @@ public class UserController {
 		return ResponseEntity.ok().body(userService.getUser(id));
 	}
 	
-	@PreAuthorize("hasAnyRole('ROLE_RESPONSABLE_OPTION','ROLE_COMITE_ORGANISATION','ROLE_ETUDIANT','ROLE_ENSEIGNANT')")
+	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH',"
+			+ "'ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
+			+ "'ROLE_PERSONNEL_FINANCIER','ROLE_EMPLOYE_CAP','ROLE_CLIENT')")
 	@GetMapping("/get-profile/{filename}")
 	@ResponseBody
 	public MessageResponse getProfile(@PathVariable("filename") String filename) {
 		return new MessageResponse(userService.getProfile(filename));
 	}
 	
-	@PreAuthorize("hasAnyRole('ROLE_RESPONSABLE_OPTION','ROLE_COMITE_ORGANISATION','ROLE_ETUDIANT','ROLE_ENSEIGNANT')")
+	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH',"
+			+ "'ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
+			+ "'ROLE_PERSONNEL_FINANCIER','ROLE_EMPLOYE_CAP','ROLE_CLIENT')")
 	@PutMapping("/change-password/{id}")
 	@ResponseBody
 	public User changePassword(@PathVariable("id") Long id,@RequestBody LoginRequest req)
@@ -107,7 +144,9 @@ public class UserController {
 
 	
 	@SuppressWarnings("all")
-	@PreAuthorize("hasAnyRole('ROLE_RESPONSABLE_OPTION','ROLE_COMITE_ORGANISATION','ROLE_ETUDIANT','ROLE_ENSEIGNANT')")
+	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH',"
+			+ "'ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
+			+ "'ROLE_PERSONNEL_FINANCIER')")
 	@PostMapping("/add")
 	@ResponseBody
 	public ResponseEntity<Object> addUser(@RequestBody User u)

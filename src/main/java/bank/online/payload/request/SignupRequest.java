@@ -8,6 +8,8 @@ public class SignupRequest {
 	private String firstname;
 	private String lastname;
 	private String email;
+	private String region;
+	private Integer contact;
 	
 	private String roles;
 	
@@ -52,6 +54,18 @@ public class SignupRequest {
 	}
 	public void setConfirmpassword(String confirmpassword) {
 		this.confirmpassword = confirmpassword;
+	}
+	public String getRegion() {
+		return region;
+	}
+	public void setRegion(String region) {
+		this.region = region;
+	}
+	public Integer getContact() {
+		return contact;
+	}
+	public void setContact(Integer contact) {
+		this.contact = contact;
 	}
 	
 	

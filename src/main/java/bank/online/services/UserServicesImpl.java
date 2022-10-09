@@ -39,7 +39,8 @@ public class UserServicesImpl implements IUserServices{
 		user.setProfile("default-profile.jpg");
 		user.setStatus(false);
 		user.setDateCreation(new Date());
-		return user;
+		user.setPassword(new BCryptPasswordEncoder().encode(user.getUsername()));
+		return userRepository.save(user);
 	}
 	
 	@Override

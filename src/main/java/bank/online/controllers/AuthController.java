@@ -117,6 +117,7 @@ public class AuthController {
 							 signUpRequest.getEmail(),
 							 encoder.encode(signUpRequest.getPassword()),
 							 signUpRequest.getLastname(),signUpRequest.getFirstname()
+							 ,signUpRequest.getRegion(),signUpRequest.getContact()
 							 );
 		
 		String strRoles = signUpRequest.getRoles();

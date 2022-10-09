@@ -3,6 +3,8 @@ package bank.online.controllers;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -17,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import bank.online.entities.Attachements;
 import bank.online.payload.response.MessageResponse;
 import bank.online.services.IFileStorageServices;
 
@@ -40,16 +44,17 @@ public class FileController {
 	      return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new MessageResponse(message));
 	    }
 	  }
-//	  @GetMapping("/files")
-//	  public ResponseEntity<List<Attachements>> getListFiles() {
-//	    List<Attachements> fileInfos = storageService.loadAll().map(path -> {
-//	      String filename = path.getFileName().toString();
-//	      String url = MvcUriComponentsBuilder
-//	          .fromMethodName(FileController.class, "getFile", path.getFileName().toString()).build().toString();
-//	      return new Attachements(filename, url);
-//	    }).collect(Collectors.toList());
-//	    return ResponseEntity.status(HttpStatus.OK).body(fileInfos);
-//	  }
+	  
+	  @GetMapping("/files")
+	  public ResponseEntity<List<Attachements>> getListFiles() {
+	    List<Attachements> fileInfos = storageService.loadAll().map(path -> {
+	      String filename = path.getFileName().toString();
+	      String url = MvcUriComponentsBuilder
+	          .fromMethodName(FileController.class, "getFile", path.getFileName().toString()).build().toString();
+	      return new Attachements(filename, url);
+	    }).collect(Collectors.toList());
+	    return ResponseEntity.status(HttpStatus.OK).body(fileInfos);
+	  }
 
 	  @GetMapping("/files/{filename:.+}")
 	  @ResponseBody

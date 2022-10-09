@@ -1,5 +1,6 @@
 package bank.online.repositories;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +16,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	
 	@Query(value = "SELECT * FROM user WHERE email =:value OR username=:value",nativeQuery = true)
 	User findByUsernameOrEmail(@Param("value") String value);
+	
+	@Query(value = "SELECT * FROM user u INNER JOIN role r on u.role_id = r.id "
+			+ "WHERE r.name IN ('ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
+			+ "'ROLE_PERSONNEL_FINANCIER','ROLE_PERSONNEL_RH')",nativeQuery = true)
+	List<User> findAllPersonnals();
+	
+	@Query(value = "SELECT * FROM user u INNER JOIN role r on u.role_id = r.id "
+			+ "WHERE r.name = 'ROLE_CLIENT'",nativeQuery = true)
+	List<User> findAllClients();
 	
 	Boolean existsByUsername(String username);
 	Boolean existsByEmail(String email);
