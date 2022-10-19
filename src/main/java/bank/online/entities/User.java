@@ -3,11 +3,18 @@ package bank.online.entities;
 import java.io.Serializable;
 
 import java.util.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Email;
@@ -52,8 +59,9 @@ public class User implements Serializable{
 	@Size(max = 120)
 	private String password;
 	private String profile;
-	private Integer contact;
-	private String region;
+	private Integer phone;
+	private String country;
+	private String city;
 	@Temporal(TemporalType.DATE)
 	private Date dateCreation;
 	@Temporal(TemporalType.DATE)
@@ -65,10 +73,20 @@ public class User implements Serializable{
 	private Boolean isBanned;
 	@Temporal(TemporalType.DATE)
 	private Date bannedAt;
-	
+	private String profession;
 	
 	@ManyToOne
+	private IntervalleAge intervalle;
+	
+	@Enumerated(EnumType.STRING)
+	private Gender gender;
+	@Enumerated(EnumType.STRING)
+	private Civilite civilite;
+	@ManyToOne
 	private Role role;
+	
+	@OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+	private List<CarteBancaire> carteBancaires;
 	
 	public User() {
 	}
@@ -86,7 +104,7 @@ public class User implements Serializable{
 		this.password = password;
 		this.lastname = lastname;
 		this.firstname = firstname;
-		this.region = region;
-		this.contact = contact;
+		this.city = region;
+		this.phone = contact;
 	}
 }

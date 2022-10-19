@@ -26,6 +26,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 			+ "WHERE r.name = 'ROLE_CLIENT'",nativeQuery = true)
 	List<User> findAllClients();
 	
+	@Query(value = "SELECT * FROM user u INNER JOIN user_carte_bancaires ucb "
+			+ "ON u.id = ucb.user_id INNER JOIN carte_bancaire cb "
+			+ "ON cb.id_carteb = ucb.carte_bancaires_id_carteb  WHERE cb.id_carteb = :idCard",nativeQuery = true)
+	List<User> getUsersByCards(@Param("idCard") Long idCard);
+	
 	Boolean existsByUsername(String username);
 	Boolean existsByEmail(String email);
 

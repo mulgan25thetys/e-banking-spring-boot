@@ -14,3 +14,5 @@
 2022-10-09 00:45:45 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
 2022-10-09 01:04:48 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
 2022-10-09 03:35:38 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-11 07:22:54 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2022-10-11 07:22:54 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource

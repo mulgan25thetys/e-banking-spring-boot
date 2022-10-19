@@ -127,44 +127,9 @@ public class AuthController {
 					.orElseThrow(() -> new RuntimeException(MESSAGE4_ROLE_ERROR));
 			roles = userRole;
 		} else {
-			
-				switch (strRoles) {
-				case "conseiller_clientele":
-					Role conseillerClientele = roleRepository.findByName(ERole.ROLE_CONSEILLER_CLIENTELE)
-							.orElseThrow(() -> new RuntimeException(MESSAGE4_ROLE_ERROR));
-					roles = conseillerClientele ;
-					break;
-				case "gestionnaire_clientele":
-					Role gestionnaireClientele = roleRepository.findByName(ERole.ROLE_GESTIONNAIRE_CLIENTELE)
-							.orElseThrow(() -> new RuntimeException(MESSAGE4_ROLE_ERROR));
-					roles = gestionnaireClientele;
-					break;
-				case "personnel_rh":
-					Role personnelRh = roleRepository.findByName(ERole.ROLE_PERSONNEL_RH)
-							.orElseThrow(() -> new RuntimeException(MESSAGE4_ROLE_ERROR));
-					roles = personnelRh;
-					break;
-				case "personnel_financier":
-					Role personnelFinancier = roleRepository.findByName(ERole.ROLE_PERSONNEL_FINANCIER)
-							.orElseThrow(() -> new RuntimeException(MESSAGE4_ROLE_ERROR));
-					roles = personnelFinancier;
-					break;
-				case "membre_directoire":
-					Role membreDirectoire = roleRepository.findByName(ERole.ROLE_MEMBRE_DIRECTOIRE)
-							.orElseThrow(() -> new RuntimeException(MESSAGE4_ROLE_ERROR));
-					roles = membreDirectoire;
-					break;
-				case "employe_cap":
-					Role employeCap = roleRepository.findByName(ERole.ROLE_EMPLOYE_CAP)
-							.orElseThrow(() -> new RuntimeException(MESSAGE4_ROLE_ERROR));
-					roles = employeCap;
-					break;
-				default:
-					Role client = roleRepository.findByName(ERole.ROLE_CLIENT)
-							.orElseThrow(() -> new RuntimeException(MESSAGE4_ROLE_ERROR));
-					roles = client;
-				}
-		
+			Role client = roleRepository.findByName(ERole.ROLE_CLIENT)
+					.orElseThrow(() -> new RuntimeException(MESSAGE4_ROLE_ERROR));
+			roles = client;
 		}
 		user.setDateCreation(new Date());
 		user.setProfile("default-profile.jpg");
