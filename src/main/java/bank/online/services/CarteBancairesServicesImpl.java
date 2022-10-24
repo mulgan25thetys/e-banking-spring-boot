@@ -1,6 +1,5 @@
 package bank.online.services;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -24,6 +23,7 @@ import bank.online.entities.TypeCarteBancaire;
 import bank.online.entities.User;
 import bank.online.repositories.CarteBancaireRepository;
 import bank.online.repositories.ContratAssuranceRepository;
+import bank.online.repositories.DevisesRepository;
 import bank.online.repositories.InformationComplementaireRepository;
 import bank.online.repositories.TarifCarteBancaireRepository;
 import bank.online.repositories.TypeCarteBancaireRepository;
@@ -36,6 +36,9 @@ public class CarteBancairesServicesImpl implements ICarteBancaireServices{
 	
 	@Autowired
 	CarteBancaireRepository carteBRepo;
+	
+	@Autowired
+	DevisesRepository deviseRepo;
 	
 	@Autowired
 	TypeCarteBancaireRepository typeCarteRepo;
@@ -70,30 +73,23 @@ public class CarteBancairesServicesImpl implements ICarteBancaireServices{
 		                        rand.nextInt(10000),
 		                        rand.nextInt(10000));
 		carte.setNumero(numero);
-		 Date date = Calendar.getInstance().getTime();  
-         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
-         String toDayFormat =  dateFormat.format(date);  
          Date toDay = new Date();
-		
+         Date newDate = new Date();
+         
          SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		  Calendar cal = Calendar.getInstance();
-		  try{
-		     //Définir la date
-		     cal.setTime(sdf.parse(toDayFormat));
-		  }catch(ParseException e){
-		    e.printStackTrace();
-		   }
-		  cal.add(Calendar.DAY_OF_YEAR, 3);  
-		  //Date après avoir ajouté les années à la date indiquée
-		  String echeance = sdf.format(cal.getTime()); 
-		  
-		  try {
-			carte.setEcheance(sdf.parse(echeance));
-			diff = sdf.parse(echeance).getTime() - toDay.getTime();
+         Calendar cal = Calendar.getInstance(); 
+ 		 cal.add(Calendar.YEAR, 3);
+		//Date après avoir ajouté les années à la date indiquée
+		String echeance = sdf.format(cal.getTime());
+		try {
+			newDate = sdf.parse(echeance);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		  
+		carte.setEcheance(newDate);
+		diff = newDate.getTime() - toDay.getTime();
+		
 		TimeUnit time = TimeUnit.DAYS; 
 	    carte.setDureeContractuelle(time.convert(diff, TimeUnit.MILLISECONDS)); //calculer la durée contractuelle
 	    carte.setDateCreation(new Date());
@@ -107,6 +103,7 @@ public class CarteBancairesServicesImpl implements ICarteBancaireServices{
 		}
 	    typeCarte.getTarif().setDateCreation(new Date());
 	    contratAssuRepo.save(carte.getContratAssurance()); //enregistrer le contrat d'assurance
+	    deviseRepo.save(carte.getTypeCarte().getTarif().getDevise());
 	    tarifRepo.save(typeCarte.getTarif());
 	    typeCarteRepo.save(typeCarte); //enregistrer le type de la carte
 	    

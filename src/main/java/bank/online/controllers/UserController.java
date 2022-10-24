@@ -55,7 +55,7 @@ public class UserController {
 		
 	}
 	
-	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE')")
+	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE','ROLE_GESTIONNAIRE_PATRIMOINE')")
 	@GetMapping("/list-all-clients")
 	@ResponseBody
 	public List<User> findAllClients() {
@@ -73,7 +73,7 @@ public class UserController {
 	@SuppressWarnings("all")
 	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH',"
 			+ "'ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
-			+ "'ROLE_PERSONNEL_FINANCIER','ROLE_EMPLOYE_CAP','ROLE_CLIENT')")
+			+ "'ROLE_DIRECTEUR_FINANCIER','ROLE_GESTIONNAIRE_PATRIMOINE','ROLE_DECIDEUR','ROLE_CONTROLEUR_GESTION','ROLE_EMPLOYE_CAP','ROLE_CLIENT')")
 	@PutMapping("/edit-user")
 	@ResponseBody
 	public ResponseEntity<Object> editUser(@Valid @RequestBody User usr)
@@ -144,9 +144,7 @@ public class UserController {
 
 	
 	@SuppressWarnings("all")
-	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH',"
-			+ "'ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
-			+ "'ROLE_PERSONNEL_FINANCIER')")
+	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH')")
 	@PostMapping("/add")
 	@ResponseBody
 	public ResponseEntity<Object> addUser(@RequestBody User u)

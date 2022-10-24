@@ -3,13 +3,15 @@ package bank.online.entities;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.Proxy;
 
@@ -29,24 +31,22 @@ import lombok.experimental.FieldDefaults;
 @ToString
 @Builder
 @AllArgsConstructor
-public class Devises implements Serializable{
-
-	/**
+public class Processus implements Serializable{/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long idDevise;
-
-	private String nom;
-	
-	private String indice;
-	private float valeur;
-	private float derniereValeur;
-	@Temporal(TemporalType.TIMESTAMP)
+	@Id
+	@Column(name = "idprocessus")
+	private Long idProcessus;
+	@Enumerated(EnumType.STRING)
+	private GroupeProcessus groupe;
+	private String description;
+	@Temporal(TemporalType.DATE)
+	private  Date dateAjout;
+	@Temporal(TemporalType.DATE)
 	private Date dateModification;
-	public Devises() {
+	public Processus() {
 		super();
 	}
 	

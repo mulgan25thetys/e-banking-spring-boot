@@ -16,3 +16,38 @@
 2022-10-09 03:35:38 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
 2022-10-11 07:22:54 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
 2022-10-11 07:22:54 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2022-10-17 02:03:05 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2022-10-17 02:03:06 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2022-10-17 02:03:35 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2022-10-17 06:11:43 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:24:16 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:26:46 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:33:12 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:34:03 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:34:06 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:34:27 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:39:30 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:39:33 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:39:34 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:39:36 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:39:44 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:41:04 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:41:41 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:42:28 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:42:55 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:42:57 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:43:00 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:43:08 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:43:49 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:44:39 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-17 06:56:20 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-18 10:06:19 bank.online.controllers.AuthController.confirmation(AuthController.java:265):265 - java.lang.IllegalArgumentException: JWT String argument cannot be null or empty.
+2022-10-18 17:01:07 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-18 17:09:15 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2022-10-19 04:18:12 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-19 04:18:40 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-19 04:18:47 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-21 06:49:23 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2022-10-21 16:44:24 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} query did not return a unique result: 2; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 2
+2022-10-23 14:34:05 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Bad credentials
+2022-10-24 13:06:51 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} query did not return a unique result: 3; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 3

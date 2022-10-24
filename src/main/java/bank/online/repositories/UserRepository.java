@@ -19,11 +19,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	
 	@Query(value = "SELECT * FROM user u INNER JOIN role r on u.role_id = r.id "
 			+ "WHERE r.name IN ('ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
-			+ "'ROLE_PERSONNEL_FINANCIER','ROLE_PERSONNEL_RH')",nativeQuery = true)
+			+ "'ROLE_GESTIONNAIRE_PATRIMOINE','ROLE_CHARGE_ETUDE','ROLE_CONTROLEUR_GESTION'"
+			+ ",'ROLE_PERSONNEL_RH') ORDER BY date_creation DESC",nativeQuery = true)
 	List<User> findAllPersonnals();
 	
 	@Query(value = "SELECT * FROM user u INNER JOIN role r on u.role_id = r.id "
-			+ "WHERE r.name = 'ROLE_CLIENT'",nativeQuery = true)
+			+ "WHERE r.name = 'ROLE_CLIENT' ORDER BY date_creation DESC",nativeQuery = true)
 	List<User> findAllClients();
 	
 	@Query(value = "SELECT * FROM user u INNER JOIN user_carte_bancaires ucb "

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,8 +18,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import bank.online.entities.CarteBancaire;
+import bank.online.entities.Devises;
+import bank.online.entities.PaiementCredit;
+import bank.online.entities.ReseauPaiement;
 import bank.online.payload.response.MessageResponse;
 import bank.online.repositories.CarteBancaireRepository;
+import bank.online.repositories.DevisesRepository;
+import bank.online.repositories.ReseauPaiementRepository;
 import bank.online.repositories.UserRepository;
 import bank.online.services.ICarteBancaireServices;
 
@@ -28,6 +34,12 @@ public class CarteBancaireController {
 
 	@Autowired
 	ICarteBancaireServices carteServices;
+	
+	@Autowired
+	DevisesRepository deviseRepo;
+	
+	@Autowired
+	ReseauPaiementRepository reseauRepo;
 	
 	@Autowired
 	CarteBancaireRepository carteRepo;
@@ -167,4 +179,41 @@ public class CarteBancaireController {
 		
 		return ResponseEntity.ok().body(carteServices.getCarteByType(typeName));
 	}
+	
+	@GetMapping("get-by-number/{number}/{idUser}")
+	@ResponseBody
+	public ResponseEntity<Object> getByNumber(@PathVariable("number") String numero,@PathVariable("idUser") Long idUser) {
+		
+		Optional<CarteBancaire> carteOptional = carteRepo.getCardByNumber(numero, idUser);
+		
+		if(!carteOptional.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Aucune carte trouvée correspond a ce numero"));
+		}
+				
+		return ResponseEntity.ok().body(carteOptional.get());
+	}
+	
+	@GetMapping("find-reseau-paiements")
+	@ResponseBody
+	public List<ReseauPaiement> findReseauxPay(){
+		return reseauRepo.findAll();
+	}
+	
+	@GetMapping("find-devises")
+	@ResponseBody
+	public List<Devises> findDevises(){
+		return deviseRepo.findAll();
+	}
+	
+	@GetMapping("get-total-provisions/{id}")
+	@ResponseBody
+	public ResponseEntity<Object> TotalProvision(@PathVariable("id") Long idUser){
+		
+		if(Boolean.FALSE.equals(userRepo.findById(idUser))) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("L'utilisateur est introuvable!"));
+		}
+		
+		return ResponseEntity.ok().body(carteRepo.getTotalCapital(idUser));
+	}
+	
 }

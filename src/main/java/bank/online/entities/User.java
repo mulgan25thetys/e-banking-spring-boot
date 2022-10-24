@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Email;
@@ -48,7 +49,6 @@ public class User implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@NotBlank
-	@Size(max = 20)
 	private String username;
 	private String firstname;
 	private String lastname;
@@ -62,6 +62,7 @@ public class User implements Serializable{
 	private Integer phone;
 	private String country;
 	private String city;
+	private String address;
 	@Temporal(TemporalType.DATE)
 	private Date dateCreation;
 	@Temporal(TemporalType.DATE)
@@ -74,8 +75,12 @@ public class User implements Serializable{
 	@Temporal(TemporalType.DATE)
 	private Date bannedAt;
 	private String profession;
+	private Boolean estDisponible;
+	private String addressIp;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date derniereConnection;
 	
-	@ManyToOne
+	@ManyToOne 
 	private IntervalleAge intervalle;
 	
 	@Enumerated(EnumType.STRING)
@@ -87,6 +92,9 @@ public class User implements Serializable{
 	
 	@OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
 	private List<CarteBancaire> carteBancaires;
+	
+	@OneToOne(cascade = CascadeType.ALL,mappedBy = "emprunteur")
+	private Credit credit;
 	
 	public User() {
 	}

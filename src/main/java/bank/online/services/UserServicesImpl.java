@@ -7,7 +7,9 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
+import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 
 import org.apache.log4j.Logger;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
@@ -33,14 +36,45 @@ public class UserServicesImpl implements IUserServices{
 	@Autowired
 	private UserRepository userRepository;
 	
+	@Autowired
+	private INotificationServices notificationServe;
+	
+	@Autowired
+	PasswordEncoder encoder;
+	
 
 	@Transactional
 	public User addUser(User user) {
 		user.setProfile("default-profile.jpg");
+		user.setUsername(user.getEmail());
 		user.setStatus(false);
 		user.setDateCreation(new Date());
-		user.setPassword(new BCryptPasswordEncoder().encode(user.getUsername()));
-		return userRepository.save(user);
+		String generatedPassword = this.generateRandomString();
+		user.setPassword(encoder.encode(generatedPassword));
+		userRepository.save(user);
+		
+		user.setPassword(generatedPassword);
+		try {
+			notificationServe.notifiyPersonnale(user);
+		} catch (MessagingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return user;
+	}
+	
+	private String generateRandomString() {
+	    int leftLimit = 97; // letter 'a'
+	    int rightLimit = 122; // letter 'z'
+	    int targetStringLength = 10;
+	    Random random = new Random();
+
+	    String generatedString = random.ints(leftLimit, rightLimit + 1)
+	      .limit(targetStringLength)
+	      .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+	      .toString();
+
+	    return generatedString;
 	}
 	
 	@Override
