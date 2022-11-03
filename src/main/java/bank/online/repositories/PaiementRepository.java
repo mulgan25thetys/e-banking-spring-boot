@@ -14,7 +14,7 @@ import bank.online.entities.PaiementCredit;
 public interface PaiementRepository extends JpaRepository<PaiementCredit, Long>{
 
 	@Query(value = "SELECT * FROM paiement_credit pc INNER JOIN credit c ON c.idcredit = pc.credit_idcredit "
-			+ "INNER JOIN user u ON u.id = c.emprunteur_id WHERE u.id =:idEmprunteur AND "
+			+ "INNER JOIN user u ON u.id = c.emprunteur_id WHERE (u.id =:idEmprunteur AND c.est_accorde = 1) AND "
 			+ "(:today < pc.date_limit AND (pc.a_rembourse = 1 AND pc.date_remboursement IS null)) "
 			+ "ORDER BY pc.date_limit ASC LIMIT 1",nativeQuery = true)
 	Optional<PaiementCredit> getMonthlyMensualityToPay(@Param("today") Date today,@Param("idEmprunteur") Long idEmprunteur);

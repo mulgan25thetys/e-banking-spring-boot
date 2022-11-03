@@ -27,4 +27,6 @@ public interface ICarteBancaireServices {
 	Integer resilierContratSubsciption(Long idCarte,Long idUser);
 	
 	Integer ajouterUnContratAssurance(Long idCarte,Long idContrat,Long idUser);
+	
+	Integer transfertFromCardToCard(Long idUser,String cardDeb,String cardCred,float montant);
 }

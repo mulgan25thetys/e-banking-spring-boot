@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 
 import bank.online.entities.CarteBancaire;
 import bank.online.entities.ContratAssurance;
+import bank.online.entities.Devises;
 import bank.online.entities.InformationComplementaire;
+import bank.online.entities.TarifCarteBancaire;
 import bank.online.entities.TypeCarteBancaire;
 import bank.online.entities.User;
 import bank.online.repositories.CarteBancaireRepository;
@@ -63,7 +65,7 @@ public class CarteBancairesServicesImpl implements ICarteBancaireServices{
 		return carteBRepo.findAll();
 	}
 
-	@Override
+	@Transactional
 	public CarteBancaire addCarteBancaire(CarteBancaire carte) {
 		long diff = 0;
 		String numero = String.format((Locale)null, //don't want any thousand separators
@@ -101,9 +103,15 @@ public class CarteBancairesServicesImpl implements ICarteBancaireServices{
 			detail.setDateCreation(new Date());
 			inforRepo.save(detail);
 		}
+	    
+	  
 	    typeCarte.getTarif().setDateCreation(new Date());
 	    contratAssuRepo.save(carte.getContratAssurance()); //enregistrer le contrat d'assurance
-	    deviseRepo.save(carte.getTypeCarte().getTarif().getDevise());
+	    TarifCarteBancaire tarif = typeCarte.getTarif();
+	    Devises devise = typeCarte.getTarif().getDevise();
+	    tarif.setDevise(devise);
+	    tarif.setDateCreation(new Date());
+	    deviseRepo.save(devise);
 	    tarifRepo.save(typeCarte.getTarif());
 	    typeCarteRepo.save(typeCarte); //enregistrer le type de la carte
 	    
@@ -263,5 +271,40 @@ public class CarteBancairesServicesImpl implements ICarteBancaireServices{
 			}	
 		}
 		return -1;
+	}
+
+	@Override
+	public Integer transfertFromCardToCard(Long idUser,String cardDeb, String cardCred,float montant) {
+		Optional<User> userOptional = userRepository.findById(idUser);
+		
+		if(!userOptional.isPresent()) {
+			return 1;//l'utilisateur n'existe pas!
+		}
+		
+		Optional<CarteBancaire> cardDebOptional = carteBRepo.getCardByNumber(cardDeb, idUser);
+		Optional<CarteBancaire> cardCredOptional = carteBRepo.getCardByNumber(cardCred, idUser);
+		
+		if(cardDebOptional.isPresent() && cardCredOptional.isPresent() && cardDebOptional.get() != cardCredOptional.get()) {
+			CarteBancaire carteDeb = cardDebOptional.get();
+			CarteBancaire carteCred = cardCredOptional.get();
+			
+			if(carteDeb.getTypeCarte().getTarif().getProvision() >= montant) {
+				TarifCarteBancaire tarifDeb = carteDeb.getTypeCarte().getTarif();
+				tarifDeb.setProvision(tarifDeb.getProvision() - montant);
+				tarifDeb.setDateModification(new Date());
+				tarifRepo.save(tarifDeb);
+				
+				TarifCarteBancaire tarifCred = carteCred.getTypeCarte().getTarif();
+				tarifCred.setProvision(tarifCred.getProvision() + montant);
+				tarifCred.setDateModification(new Date());
+				tarifRepo.save(tarifCred);
+				
+				return 0; //L'opération a reussie!
+			}else {
+				return 3;//vous avez un manque de provision sur la carte à debiter
+			}
+		}else {
+			return 2; //au moins une carte est introuvable!
+		}
 	}
 }

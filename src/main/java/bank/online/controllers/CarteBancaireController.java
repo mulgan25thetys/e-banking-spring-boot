@@ -10,7 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import bank.online.entities.CarteBancaire;
 import bank.online.entities.Devises;
-import bank.online.entities.PaiementCredit;
 import bank.online.entities.ReseauPaiement;
 import bank.online.payload.response.MessageResponse;
 import bank.online.repositories.CarteBancaireRepository;
@@ -86,7 +84,7 @@ public class CarteBancaireController {
 		return ResponseEntity.ok().body(new MessageResponse("Un carte bancaire "+cardDetail+" a été supprimée"));
 	}
 	
-	@PostMapping("add")
+	@PutMapping("add")
 	@ResponseBody
 	public ResponseEntity<Object> add(@RequestBody CarteBancaire carte){
 		return ResponseEntity.ok().body(carteServices.addCarteBancaire(carte));
@@ -216,4 +214,36 @@ public class CarteBancaireController {
 		return ResponseEntity.ok().body(carteRepo.getTotalCapital(idUser));
 	}
 	
+	@PutMapping("transfert-card-to-card/{idUser}/{cardDNum}/{cardCNum}/{montant}")
+	@ResponseBody
+	public ResponseEntity<Object> transfertCardToCard(@PathVariable("idUser") Long idUser,@PathVariable("cardDNum") String cardDNum,
+			@PathVariable("cardCNum") String cardCNum,@PathVariable("montant") float montant){
+		
+		int verif = carteServices.transfertFromCardToCard(idUser, cardDNum, cardCNum, montant);
+		
+		if(verif == 1) {
+			return ResponseEntity.badRequest().body(new MessageResponse("L'utilisateur n'existe pas!"));
+		}
+		
+		if(verif == 2) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Au moins une carte est introuvable!"));
+		}
+		
+		if(verif == 3) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Vous avez un manque de provision sur la carte à debiter!"));
+		}
+		
+		return ResponseEntity.ok().body(new MessageResponse("L'opération a reussie!"));
+	}
+	
+	@GetMapping("get-card-number/{id}")
+	@ResponseBody
+	public ResponseEntity<Object> getCardNumber(@PathVariable("id") Long idUser){
+		
+		if(Boolean.FALSE.equals(userRepo.findById(idUser))) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("L'utilisateur est introuvable!"));
+		}
+		
+		return ResponseEntity.status(HttpStatus.OK).body(carteRepo.getLowCardNumber(idUser));
+	}
 }

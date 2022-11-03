@@ -46,6 +46,7 @@ public class ProduitImmobilier implements Serializable{
 	private Integer quantite;
 	@Enumerated(EnumType.STRING)
 	private TypeDestination destination;
+	@Column(length = 10000)
 	private String destination_description;
 	private Boolean estAcheteACredit;
 	private Float montant_revente;

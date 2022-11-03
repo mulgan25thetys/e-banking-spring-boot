@@ -51,11 +51,14 @@ public class Credit implements Serializable{/**
 	private CategorieCredit categorie;
 	
 	@Enumerated(EnumType.STRING)
-	private ModeRemboursement modeRemboursement;
+	private TypeSimulation typeSimulation;
 	
 	private Float montantDemande;
 	private Float montantMensuel;
 	private Float apportPersonnel;
+	private Float salaireNetPersonnel;
+	private Float primeAnnuelle;
+	private Float autresRevenus;
 	private Float montantTransaction;
 	private Integer duree;
 	@Temporal(TemporalType.DATE)
@@ -66,6 +69,14 @@ public class Credit implements Serializable{/**
 	private Date dateModification;
 	private Boolean rembourse;
 	private String description;
+	@Enumerated(EnumType.STRING)
+	private StatusCredit status;
+	private Boolean estAccorde;
+	private Boolean inUse;
+	
+	@OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+	private List<Attachements> fichiers;
+	
 	
 	@JsonIgnore
 	@OneToOne
@@ -81,12 +92,12 @@ public class Credit implements Serializable{/**
 		super();
 	}
 
-	public Credit(CategorieCredit categorie, ModeRemboursement modeRemboursement, Float montantDemande,
+	public Credit(CategorieCredit categorie, TypeSimulation typeSimulation, Float montantDemande,
 			Float montantMensuel, Float montantTransaction, Integer duree, Date echeance, String description,
-			List<PaiementCredit> paiements) {
+			List<PaiementCredit> paiements,StatusCredit status,Boolean accorde) {
 		super();
 		this.categorie = categorie;
-		this.modeRemboursement = modeRemboursement;
+		this.typeSimulation = typeSimulation;
 		this.montantDemande = montantDemande;
 		this.montantMensuel = montantMensuel;
 		this.montantTransaction = montantTransaction;
@@ -94,6 +105,30 @@ public class Credit implements Serializable{/**
 		this.echeance = echeance;
 		this.description = description;
 		this.paiements =paiements;
+		this.status =status;
+		this.estAccorde = accorde;
+	}
+	
+	public Credit(CategorieCredit categorie, TypeSimulation typeSimulation, Float montantDemande,
+			Float montantMensuel, Float montantTransaction, Integer duree, Date echeance, String description,
+			List<PaiementCredit> paiements,StatusCredit status,Float apportPersonnel,Float salaireNetPersonnel,
+			Float primeAnnuelle,Float autresRevenus,Boolean accorde) {
+		super();
+		this.categorie = categorie;
+		this.typeSimulation = typeSimulation;
+		this.montantDemande = montantDemande;
+		this.montantMensuel = montantMensuel;
+		this.montantTransaction = montantTransaction;
+		this.duree = duree;
+		this.echeance = echeance;
+		this.description = description;
+		this.paiements =paiements;
+		this.status =status;
+		this.apportPersonnel = apportPersonnel;
+		this.salaireNetPersonnel = salaireNetPersonnel;
+		this.primeAnnuelle =primeAnnuelle;
+		this.autresRevenus =autresRevenus;
+		this.estAccorde = accorde;
 	}
 	
 	

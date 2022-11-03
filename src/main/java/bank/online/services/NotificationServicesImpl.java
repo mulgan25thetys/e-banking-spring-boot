@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
+import bank.online.entities.Credit;
 import bank.online.entities.User;
 import bank.online.repositories.UserRepository;
 
@@ -110,5 +111,38 @@ public class NotificationServicesImpl implements INotificationServices{
         }
         userRepository.save(user);
         sender.send(message);
+	}
+
+	@Override
+	public void notifiyForcreditConfirmation(Credit credit, User user) throws MessagingException {
+		MimeMessage message = sender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message,
+                MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                StandardCharsets.UTF_8.name());
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("name",user.getFirstname() + " "+user.getLastname());
+        model.put("m_demande",credit.getMontantDemande());
+        model.put("m_mensualite",credit.getMontantMensuel());
+        model.put("m_transaction",credit.getMontantTransaction());
+        model.put("duree",credit.getDuree());
+
+        Context context = new Context();
+        context.setVariables(model);
+        String html = "";
+       
+        html = templateEngine.process("credit_immo_confirmation", context);
+        
+
+        try {
+            helper.setTo(user.getEmail());
+            helper.setText(html,true);
+            helper.setSubject("Notification Crédit Immobilier");
+        } catch (javax.mail.MessagingException e) {
+            log.debug(e);
+        }
+        userRepository.save(user);
+        sender.send(message);
+		
 	}
 }

@@ -46,6 +46,7 @@ public class ProjetImmobilier implements Serializable{/**
 	private Long idProjet;
 	@Enumerated(EnumType.STRING)
 	private MotifProjet motif;
+	@Column(length = 10000)
 	private String description;
 	@Enumerated(EnumType.STRING)
 	private StatusProjet status;

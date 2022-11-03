@@ -32,6 +32,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 			+ "ON cb.id_carteb = ucb.carte_bancaires_id_carteb  WHERE cb.id_carteb = :idCard",nativeQuery = true)
 	List<User> getUsersByCards(@Param("idCard") Long idCard);
 	
+	@Query(value = "SELECT * FROM user u INNER JOIN credit c ON u.id = c.emprunteur_id WHERE c.idcredit =:idCredit",nativeQuery =true)
+	User getEmprunteur(@Param("idCredit") Long idCredit);
+	
 	Boolean existsByUsername(String username);
 	Boolean existsByEmail(String email);
 

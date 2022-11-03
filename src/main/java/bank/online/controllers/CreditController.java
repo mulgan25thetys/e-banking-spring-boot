@@ -8,6 +8,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +18,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import bank.online.entities.CarteBancaire;
 import bank.online.entities.Credit;
@@ -80,10 +84,24 @@ public class CreditController {
 		return ResponseEntity.ok().body(creditService.simulerCreditConsommation(credit));
 	}
 	
-	@PostMapping("simulate-credit-immo")
+	@PostMapping("add-credit-immo/{id}")
 	@ResponseBody
-	public ResponseEntity<Object> simulateCreditImmo(){
-		return null;
+	public ResponseEntity<Object> simulateCreditImmo(@RequestBody Credit credit,@PathVariable("id") Long idUser){
+		Optional<User> userOptional = userRepo.findById(idUser);
+		
+		if(!userOptional.isPresent()) {
+			return ResponseEntity.badRequest().body(new MessageResponse("L'utilisateur n'exist pas!"));
+		}
+		
+		if(userOptional.isPresent() && userOptional.get().getCredit() !=null) {
+			
+			if(userOptional.get().getCredit() !=null && ( userOptional.get().getCredit().getRembourse() == null || userOptional.get().getCredit().getRembourse() == false)) {
+				return ResponseEntity.badRequest().body(new MessageResponse("L'opération a échouée,Vous avez un credit en cours!"));	
+			}
+		}
+		creditService.simulerCreditImmobilier(credit, idUser);
+		
+		return ResponseEntity.ok().body(new MessageResponse("Votre demande a été prise en compte!"));
 	}
 	
 	@PostMapping("add-credit-to-card/{idUser}/{numeroCarte}")
@@ -106,11 +124,34 @@ public class CreditController {
 		
 		if(user.isPresent() && user.get().getCredit() !=null) {
 			
-			if(user.get().getCredit().getRembourse() == null || user.get().getCredit().getRembourse() == false) {
+			if(user.get().getCredit() !=null && ( user.get().getCredit().getRembourse() == null || user.get().getCredit().getRembourse() == false)) {
 				return ResponseEntity.badRequest().body(new MessageResponse("L'opération a échouée,Vous avez un credit en cours!"));	
 			}
 		}
 		return ResponseEntity.ok().body(creditService.addToCarteBancaire(credit,idUser,numeroCarte));
+	}
+	
+	@PutMapping("use-credit-in-card/{idUser}/{numeroCarte}")
+	@ResponseBody
+	public ResponseEntity<Object> useCredit(@RequestBody Credit credit,@PathVariable("idUser") Long idUser,@PathVariable("numeroCarte") String numeroCarte){
+		if(Boolean.FALSE.equals(userRepo.existsById(idUser))) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("L'utilisateur recherché est introuvable!"));
+		}
+		
+		Optional<User> user = userRepo.findById(idUser);
+		if(user.isPresent() && !user.get().getRole().getName().equals(ERole.ROLE_CLIENT)) {
+			
+			return ResponseEntity.badRequest().body(new MessageResponse("L'opération a échouée,Veuillez vous abonner!"));
+		}
+		
+		Optional<CarteBancaire> carteOptional= carteRepo.getCardByNumber(numeroCarte, idUser);
+		if(!carteOptional.isPresent()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Attention! La carte indiqué est introuvable."));
+		}
+		
+		creditService.useCredit(credit,idUser,numeroCarte);
+		
+		return ResponseEntity.ok().body(new MessageResponse("Votre crédit est pret a l'emploie!"));
 	}
 
 	@GetMapping("get-paiements/{idCredit}")
@@ -134,11 +175,12 @@ public class CreditController {
 		}
 		
 		Optional<User> user = userRepo.findById(id);
+		
 		if(user.isPresent()) {
-			Credit credit = user.get().getCredit();
+			Credit credit = creditRepo.getNoneRembourmentCreditByUser(user.get().getId());
 			return ResponseEntity.ok().body(credit);
 		}
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Une erreur s'est produite veuillez ressayer!"));
+		return ResponseEntity.status(HttpStatus.ACCEPTED).body(new MessageResponse("Une erreur s'est produite veuillez ressayer!"));
 	}
 	
 	@GetMapping("get-mensuality-by-user/{id}")
@@ -195,4 +237,43 @@ public class CreditController {
 		
 		return ResponseEntity.ok().body(new MessageResponse("Votre remboursement a été bien réalisé!"));
 	}
+	
+	@GetMapping("find-emprunteur/{idCredit}")
+	@ResponseBody
+	public ResponseEntity<Object> findEmprunteur(@PathVariable("idCredit") Long idCredit){
+		return ResponseEntity.ok().body(userRepo.getEmprunteur(idCredit));
+	}
+	
+	@PutMapping("accorde-credit-immo/{idCredit}")
+	@ResponseBody
+	public ResponseEntity<Object> accordeCreditImmo(@PathVariable("idCredit") Long idCredit){
+		int verif = creditService.accorderCreditImmo(idCredit);
+		
+		if(verif == -1) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Le credit à accordé n'existe pas"));
+		}
+		
+		return ResponseEntity.ok().body(new MessageResponse("Le credit est accordé avec success"));
+	}
+	
+	@PutMapping("/upload/{idCred}")
+	  public ResponseEntity<MessageResponse> uploadFile(@PathVariable("idCred") Long idCredit,@RequestParam("file") MultipartFile file) {
+	    String message = "";
+	    try {
+	      creditService.save(file,idCredit);
+	      message = "Uploaded the file successfully: " + file.getOriginalFilename();
+	      return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse(message));
+	    } catch (Exception e) {
+	      message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+	      return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new MessageResponse(message));
+	    }
+	  }
+	
+	@GetMapping("/files/{filename:.+}")
+	  @ResponseBody
+	  public ResponseEntity<Resource> getFile(@PathVariable String filename) {
+	    Resource file = creditService.load(filename);
+	    return ResponseEntity.ok()
+	        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+	  }
 }
