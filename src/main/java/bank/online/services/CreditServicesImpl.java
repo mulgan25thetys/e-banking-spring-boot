@@ -31,12 +31,15 @@ import bank.online.entities.Credit;
 import bank.online.entities.DomaineAvancement;
 import bank.online.entities.PaiementCredit;
 import bank.online.entities.StatusCredit;
+import bank.online.entities.NiveauCredit;
+import bank.online.entities.Notification;
 import bank.online.entities.TypeSimulation;
 import bank.online.entities.User;
 import bank.online.repositories.AttachmentRepository;
 import bank.online.repositories.CarteBancaireRepository;
 import bank.online.repositories.CreditRepository;
 import bank.online.repositories.DomainAvancementRepository;
+import bank.online.repositories.NotificationRepository;
 import bank.online.repositories.PaiementRepository;
 import bank.online.repositories.ProcessusRepository;
 import bank.online.repositories.ProduitImmobilierRepository;
@@ -73,6 +76,9 @@ public class CreditServicesImpl implements ICreditServices{
 	private CarteBancaireRepository carteRepo;
 	
 	@Autowired
+	private NotificationRepository notifRepo;
+	
+	@Autowired
 	INotificationServices notificationServe;
 	
 	@Autowired
@@ -92,6 +98,9 @@ public class CreditServicesImpl implements ICreditServices{
 	
 	@Transactional
 	public Credit addToCarteBancaire(Credit credit, Long idUser,String carteNumber) {
+		String message = "";
+		Credit updatedCredit = creditRepo.save(credit);
+		
 		credit.setDateAjout(new Date());
 		User user = userRepo.findById(idUser).orElse(null);
 		Optional<CarteBancaire> carteOptional = carteRepo.getCardByNumber(carteNumber,idUser);
@@ -100,7 +109,7 @@ public class CreditServicesImpl implements ICreditServices{
 			CarteBancaire carte = carteOptional.get();
 			for (PaiementCredit paiement : credit.getPaiements()) {
 				paiement.setDateAjout(new Date());
-				paiement.setCredit(credit);
+				paiement.setCredit(updatedCredit);
 				paiementRepo.save(paiement);
 			}
 			carte.getTypeCarte().getTarif().setProvision( carte.getTypeCarte().getTarif().getProvision() + credit.getMontantDemande());
@@ -108,10 +117,45 @@ public class CreditServicesImpl implements ICreditServices{
 			carte.getTypeCarte().getTarif().setDateModification(new Date());
 			tarifRepo.save(carte.getTypeCarte().getTarif());
 			carteRepo.save(carte);
+			
+			message = "Le client "+user.getFirstname()+" "+user.getLastname()+" a éffectué une demande "
+					+ "de crédit "+credit.getCategorie().name()+" pour un montant de "+credit.getMontantDemande()+"("+carte.getTypeCarte().getTarif().getDevise().getIndice()+")"
+							+ " de durée "+credit.getDuree()+" Mois";
 		}
 		credit.setEmprunteur(user);
 		credit.setInUse(true);
-		return creditRepo.save(credit);
+		credit.setResteVersement(credit.getPaiements().size());
+		
+		List<User> personnals = userRepo.findAllClientManagers();
+		
+		this.sendNotificationToUsersByRole("Demande de crédit",message,personnals);
+		
+		return updatedCredit;
+	}
+	
+	private void sendNotificationToUsersByRole(String object,String message,List<User> notifiers) {
+		Notification notification = new Notification();
+		notification.setByMail(false);
+		notification.setInInternal(true);
+		notification.setDateNotification(new Date());
+		notification.setIsShowed(false);
+		notification.setIsView(false);
+		notification.setSended(true);
+		notification.setObject(object);
+		notification.setMessage(message);
+		
+		List<Notification> listNotifications = new ArrayList<Notification>();
+		listNotifications.add(notification);
+		
+			for (User user : notifiers) {
+				if(user.getNotifications() == null) {
+					user.setNotifications(listNotifications);
+				}else if(!user.getNotifications().contains(notification)) {
+					user.getNotifications().add(notification);
+				}
+				
+				userRepo.save(user);
+			}
 	}
 
 	@Override
@@ -137,13 +181,13 @@ public class CreditServicesImpl implements ICreditServices{
 			if(credit.getTypeSimulation().equals(TypeSimulation.CALCUL_CAPACITE_EMPRUNT)) {
 				Credit newCredit = new Credit(credit.getCategorie(), credit.getTypeSimulation(), 
 						credit.getMontantDemande(), credit.getMontantMensuel(), credit.getMontantTransaction(), 
-						credit.getDuree(), credit.getEcheance(), credit.getDescription(),credit.getPaiements(),credit.getStatus(),credit.getApportPersonnel(),
+						credit.getDuree(), credit.getEcheance(), credit.getDescription(),credit.getPaiements(),credit.getNiveau(),credit.getApportPersonnel(),
 						credit.getSalaireNetPersonnel(),credit.getPrimeAnnuelle(),credit.getAutresRevenus(),credit.getEstAccorde());
 				return newCredit;
 			}else {
 				Credit newCredit = new Credit(credit.getCategorie(), credit.getTypeSimulation(), 
 						credit.getMontantDemande(), credit.getMontantMensuel(), credit.getMontantTransaction(), 
-						credit.getDuree(), credit.getEcheance(), credit.getDescription(),credit.getPaiements(),credit.getStatus(),credit.getEstAccorde());
+						credit.getDuree(), credit.getEcheance(), credit.getDescription(),credit.getPaiements(),credit.getNiveau(),credit.getEstAccorde());
 				return newCredit;
 			}
 			
@@ -155,7 +199,7 @@ public class CreditServicesImpl implements ICreditServices{
 		List<PaiementCredit> paiements = new ArrayList<PaiementCredit>();
 		float cout = 0;
 		
-		if(credit.getMontantDemande() != null && credit.getMontantMensuel()!= null && credit.getMontantDemande() >= credit.getMontantMensuel()) {
+		if(credit.getMontantDemande() != null && (credit.getMontantMensuel()!= null && credit.getMontantDemande() >= credit.getMontantMensuel())) {
 			int duree = 1;
 			float interestPaye,amortissement,newCapital;
 			interestPaye = (float)(credit.getMontantDemande() * interest)/(100);
@@ -167,7 +211,7 @@ public class CreditServicesImpl implements ICreditServices{
 			while(amortissement < newCapital ) {
 				interestPaye = (float)(newCapital * interest)/(100);
 				amortissement = (float)credit.getMontantMensuel() - (float)interestPaye;
-				newCapital = (float)newCapital - (float)amortissement;
+				newCapital -= (float)amortissement;
 				duree +=1;
 				PaiementCredit newPaiement = new PaiementCredit(newCapital, interestPaye, amortissement, credit.getMontantMensuel(), true, this.getNewDateByAddingMonth(duree));
 				paiements.add(newPaiement);
@@ -182,9 +226,9 @@ public class CreditServicesImpl implements ICreditServices{
 			cout += paiementCredit.getInteret();	
 		}
 		if(cout > 5000) {
-			credit.setStatus(StatusCredit.hight);
+			credit.setNiveau(NiveauCredit.hight);
 		}else {
-			credit.setStatus(StatusCredit.low);
+			credit.setNiveau(NiveauCredit.low);
 		}
 		credit.setMontantTransaction(cout);
 		
@@ -240,9 +284,9 @@ public class CreditServicesImpl implements ICreditServices{
 			cout += paiementCredit.getInteret();	
 		}
 		if(cout > 5000) {
-			credit.setStatus(StatusCredit.hight);
+			credit.setNiveau(NiveauCredit.hight);
 		}else {
-			credit.setStatus(StatusCredit.low);
+			credit.setNiveau(NiveauCredit.low);
 		}
 		credit.setMontantTransaction(cout);
 		
@@ -266,6 +310,12 @@ public class CreditServicesImpl implements ICreditServices{
 				result = this.payerParCarteBancaire(carte, paiement);
 			}else {
 				result = -3;
+			}
+			
+			if(result == 0) {
+				Credit credit = creditOptional.get();
+				credit.setResteVersement(credit.getResteVersement() -1);
+				creditRepo.save(credit);
 			}
 		}else {
 			result = 1;
@@ -311,7 +361,7 @@ public class CreditServicesImpl implements ICreditServices{
 
 	@Override
 	public Credit simulerCreditImmobilier(Credit credit,Long idUser) {
-		
+		String message ="";
 		Optional<User> userOptional = userRepo.findById(idUser);
 		
 		if(userOptional.isPresent()) {
@@ -329,11 +379,18 @@ public class CreditServicesImpl implements ICreditServices{
 			credit.setEmprunteur(userOptional.get());
 			credit.setDateAjout(new Date());
 			credit.setEstAccorde(false);
+			credit.setStatus(StatusCredit.ATTENTE);
 			
 			prodImmoRepo.save(credit.getProjet().getProduit());
 			projImmoRepo.save(credit.getProjet());
 			
+			message = "Le client "+userOptional.get().getFirstname()+" "+userOptional.get().getLastname()+" a éffectué une demande "
+					+ "de crédit "+credit.getCategorie().name()+" pour un mantant de "+credit.getMontantDemande();
 		
+			List<User> personnals = userRepo.findAllClientManagers();
+			
+			this.sendNotificationToUsersByRole("Demande de crédit",message,personnals);
+			
 			Credit newCredit = creditRepo.save(credit);
 		
 			return newCredit;
@@ -343,7 +400,7 @@ public class CreditServicesImpl implements ICreditServices{
 
 	private Credit calculerCapaciteEmprunt(Credit credit) {
 		
-		if(credit.getMontantMensuel() !=null && credit.getApportPersonnel()!= null && credit.getSalaireNetPersonnel() !=null) {
+		if(credit.getMontantMensuel() !=null && credit.getSalaireNetPersonnel() !=null) {
 			float revenus =0;
 			revenus += credit.getSalaireNetPersonnel();
 			if(credit.getPrimeAnnuelle() !=null) {
@@ -354,8 +411,12 @@ public class CreditServicesImpl implements ICreditServices{
 				revenus += credit.getAutresRevenus();
 			}
 			
-			float richesse = revenus - (credit.getApportPersonnel() + credit.getMontantMensuel());
-			float capaciteEmprunt = (float) (richesse * tauxEndettement) /(100);
+			float richesse = revenus - credit.getMontantMensuel();
+			if(credit.getApportPersonnel()!= null) {
+				richesse-=credit.getApportPersonnel();
+			}
+			
+			float capaciteEmprunt = (float) (richesse * 100) /(tauxEndettement);
 			
 			if(credit.getMontantDemande() == null) {
 				credit.setMontantDemande(capaciteEmprunt);
@@ -374,27 +435,70 @@ public class CreditServicesImpl implements ICreditServices{
 			Credit credit =creditOptional.get();
 	
 			credit.setDateModification(new Date());
+			List<PaiementCredit> paiements = new ArrayList<PaiementCredit>();
+			float cout = 0;
 			
-			credit = this.CalculerEcheance(credit);
+				int duree = 1;
+				float interestPaye,amortissement,newCapital;
+				interestPaye = (float)(credit.getMontantDemande() * interest)/(100);
+				amortissement = (float)credit.getMontantMensuel() - (float)interestPaye;
+				newCapital = (float)credit.getMontantDemande() - (float)amortissement;
+				PaiementCredit paiement = new PaiementCredit(credit.getMontantDemande(), interestPaye, amortissement, credit.getMontantMensuel(), true, this.getNewDateByAddingMonth(1));
+				paiements.add(paiement);
+				
+				while(amortissement < newCapital ) {
+					interestPaye = (float)(newCapital * interest)/(100);
+					amortissement = (float)credit.getMontantMensuel() - (float)interestPaye;
+					newCapital -= (float)amortissement;
+					duree +=1;
+					PaiementCredit newPaiement = new PaiementCredit(newCapital, interestPaye, amortissement, credit.getMontantMensuel(), true, this.getNewDateByAddingMonth(duree));
+					paiements.add(newPaiement);
+				}
+				credit.setEstAccorde(true);
+				credit.setDuree(duree);
+				
+			
+			credit.setPaiements(paiements);
+			for (PaiementCredit paiementCredit : credit.getPaiements()) {
+				cout += paiementCredit.getInteret();	
+			}
+			if(cout > 5000) {
+				credit.setNiveau(NiveauCredit.hight);
+			}else {
+				credit.setNiveau(NiveauCredit.low);
+			}
+			credit.setMontantTransaction(cout);
 			
 			if(credit.getDuree() !=null) {
 				credit.setEcheance(this.getNewDateByAddingMonth(credit.getDuree()));
 			}
 			
 			credit.setInUse(false);
+			credit.setStatus(StatusCredit.ACCORDE);
+			credit.setResteVersement(credit.getPaiements().size());
+			
 			Credit newCredit = creditRepo.save(credit);
 			if(!credit.getPaiements().isEmpty()) {
-				for (PaiementCredit paiement : credit.getPaiements()) {
-					paiement.setDateAjout(new Date());
-					paiement.setCredit(newCredit);
-					paiementRepo.save(paiement);
+				for (PaiementCredit paiementt : credit.getPaiements()) {
+					paiementt.setDateAjout(new Date());
+					paiementt.setCredit(credit);
+					paiementRepo.save(paiementt);
 				}
 			}
+			//Credit newCredit = creditRepo.save(credit);
+			
+			String message = "Mrs/Mme "+credit.getEmprunteur().getFirstname()+" "+credit.getEmprunteur().getLastname()+" votre demande "
+					+ "de crédit "+credit.getCategorie().name()+" pour un mantant de "+credit.getMontantDemande()+" a été accordé";
+		
+			List<User> recepient = new ArrayList<User>();
+			recepient.add(credit.getEmprunteur());
+			this.sendNotificationToUsersByRole("Demande de crédit",message,recepient);
 			try {
 				notificationServe.notifiyForcreditConfirmation(newCredit, newCredit.getEmprunteur());
 			} catch (MessagingException e) {
 				e.printStackTrace();
 			}
+			
 			return 0;
 		}
 		return -1;
@@ -444,24 +548,25 @@ public class CreditServicesImpl implements ICreditServices{
 
 	@Override
 	public void useCredit(Credit credit, Long idUser, String carteNumber) {
-		credit.setDateAjout(new Date());
+		Credit updatedCredit = creditRepo.findById(credit.getIdCredit()).orElse(null);
+		updatedCredit.setDateModification(new Date());
 		User user = userRepo.findById(idUser).orElse(null);
 		Optional<CarteBancaire> carteOptional = carteRepo.getCardByNumber(carteNumber,idUser);
 		
-		if(carteOptional.isPresent() && !credit.getPaiements().isEmpty()) {
+		if(carteOptional.isPresent() && !updatedCredit.getPaiements().isEmpty()) {
 			CarteBancaire carte = carteOptional.get();
 			carte.getTypeCarte().getTarif().setProvision( carte.getTypeCarte().getTarif().getProvision() + credit.getMontantDemande());
 			carte.setDateModification(new Date());
 			carte.getTypeCarte().getTarif().setDateModification(new Date());
 			
-			credit.setInUse(true);
+			updatedCredit.setInUse(true);
 			tarifRepo.save(carte.getTypeCarte().getTarif());
 			carteRepo.save(carte);
 			
-			creditRepo.save(credit);
+			creditRepo.save(updatedCredit);
 		}
-		credit.setEmprunteur(user);
-		credit.setInUse(true);
-		creditRepo.save(credit);
+		updatedCredit.setEmprunteur(user);
+		updatedCredit.setInUse(true);
+		creditRepo.save(updatedCredit);
 	}
 }

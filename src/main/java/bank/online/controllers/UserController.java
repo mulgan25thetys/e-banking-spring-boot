@@ -1,6 +1,7 @@
 package bank.online.controllers;
 
 import java.util.List;
+import java.util.Random;
 
 import javax.validation.Valid;
 
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,6 +41,9 @@ public class UserController {
 	
 	@Autowired
 	IUserServices userService;
+	
+	@Autowired
+	PasswordEncoder encoder;
 
 	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE')")
 	@GetMapping("/list-all")
@@ -160,6 +165,21 @@ public class UserController {
 					.body(new MessageResponse("Error: Email is already in use!"));
 		}
 		
+		//u.setPassword(encoder.encode(this.generateRandomString()));
 		return ResponseEntity.ok().body(userService.addUser(u));
+	}
+	
+	private String generateRandomString() {
+	    int leftLimit = 97; // letter 'a'
+	    int rightLimit = 122; // letter 'z'
+	    int targetStringLength = 10;
+	    Random random = new Random();
+
+	    String generatedString = random.ints(leftLimit, rightLimit + 1)
+	      .limit(targetStringLength)
+	      .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+	      .toString();
+
+	    return generatedString;
 	}
 }

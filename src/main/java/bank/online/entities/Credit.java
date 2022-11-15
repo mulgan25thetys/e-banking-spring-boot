@@ -17,6 +17,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Proxy;
 
@@ -70,9 +71,14 @@ public class Credit implements Serializable{/**
 	private Boolean rembourse;
 	private String description;
 	@Enumerated(EnumType.STRING)
+	private NiveauCredit niveau;
+	@Enumerated(EnumType.STRING)
 	private StatusCredit status;
 	private Boolean estAccorde;
 	private Boolean inUse;
+	private Integer resteVersement;
+	@Transient
+	private Integer nombre;
 	
 	@OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private List<Attachements> fichiers;
@@ -94,7 +100,7 @@ public class Credit implements Serializable{/**
 
 	public Credit(CategorieCredit categorie, TypeSimulation typeSimulation, Float montantDemande,
 			Float montantMensuel, Float montantTransaction, Integer duree, Date echeance, String description,
-			List<PaiementCredit> paiements,StatusCredit status,Boolean accorde) {
+			List<PaiementCredit> paiements,NiveauCredit status,Boolean accorde) {
 		super();
 		this.categorie = categorie;
 		this.typeSimulation = typeSimulation;
@@ -105,13 +111,13 @@ public class Credit implements Serializable{/**
 		this.echeance = echeance;
 		this.description = description;
 		this.paiements =paiements;
-		this.status =status;
+		this.niveau =status;
 		this.estAccorde = accorde;
 	}
 	
 	public Credit(CategorieCredit categorie, TypeSimulation typeSimulation, Float montantDemande,
 			Float montantMensuel, Float montantTransaction, Integer duree, Date echeance, String description,
-			List<PaiementCredit> paiements,StatusCredit status,Float apportPersonnel,Float salaireNetPersonnel,
+			List<PaiementCredit> paiements,NiveauCredit niveau,Float apportPersonnel,Float salaireNetPersonnel,
 			Float primeAnnuelle,Float autresRevenus,Boolean accorde) {
 		super();
 		this.categorie = categorie;
@@ -123,12 +129,20 @@ public class Credit implements Serializable{/**
 		this.echeance = echeance;
 		this.description = description;
 		this.paiements =paiements;
-		this.status =status;
+		this.niveau =niveau;
 		this.apportPersonnel = apportPersonnel;
 		this.salaireNetPersonnel = salaireNetPersonnel;
 		this.primeAnnuelle =primeAnnuelle;
 		this.autresRevenus =autresRevenus;
 		this.estAccorde = accorde;
+	}
+
+	public Credit(CategorieCredit categorie, Integer nombre, Date dateAjout) {
+		super();
+		this.categorie = categorie;
+		this.nombre = nombre;
+		this.dateAjout = dateAjout;
+		
 	}
 	
 	

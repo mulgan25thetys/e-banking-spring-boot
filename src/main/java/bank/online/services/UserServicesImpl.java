@@ -53,9 +53,9 @@ public class UserServicesImpl implements IUserServices{
 		user.setPassword(encoder.encode(generatedPassword));
 		userRepository.save(user);
 		
-		user.setPassword(generatedPassword);
+		//user.setPassword(generatedPassword);
 		try {
-			notificationServe.notifiyPersonnale(user);
+			notificationServe.notifiyPersonnale(user,generatedPassword);
 		} catch (MessagingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

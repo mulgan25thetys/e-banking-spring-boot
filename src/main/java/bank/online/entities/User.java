@@ -93,6 +93,9 @@ public class User implements Serializable{
 	@OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
 	private List<CarteBancaire> carteBancaires;
 	
+	@OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+	private List<Notification> notifications;
+	
 	@OneToOne(cascade = CascadeType.ALL,mappedBy = "emprunteur")
 	private Credit credit;
 	

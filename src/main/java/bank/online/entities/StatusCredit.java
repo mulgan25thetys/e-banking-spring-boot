@@ -1,5 +1,5 @@
 package bank.online.entities;
 
 public enum StatusCredit {
-	low,hight
+	ATTENTE,REFUSE,ACCORDE
 }

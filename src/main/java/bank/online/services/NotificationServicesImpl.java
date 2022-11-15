@@ -84,7 +84,7 @@ public class NotificationServicesImpl implements INotificationServices{
     }
 
 	@Override
-	public void notifiyPersonnale(User user) throws MessagingException {
+	public void notifiyPersonnale(User user,String password) throws MessagingException {
 		MimeMessage message = sender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message,
                 MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
@@ -93,7 +93,7 @@ public class NotificationServicesImpl implements INotificationServices{
         Map<String, Object> model = new HashMap<>();
         model.put("name",user.getFirstname() + " "+user.getLastname());
         model.put("username",user.getEmail());
-        model.put("password",user.getPassword());
+        model.put("password",password);
 
         Context context = new Context();
         context.setVariables(model);

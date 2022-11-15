@@ -1,5 +1,7 @@
 package bank.online.controllers;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +14,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -247,6 +250,7 @@ public class CreditController {
 	@PutMapping("accorde-credit-immo/{idCredit}")
 	@ResponseBody
 	public ResponseEntity<Object> accordeCreditImmo(@PathVariable("idCredit") Long idCredit){
+		
 		int verif = creditService.accorderCreditImmo(idCredit);
 		
 		if(verif == -1) {
@@ -254,6 +258,20 @@ public class CreditController {
 		}
 		
 		return ResponseEntity.ok().body(new MessageResponse("Le credit est accordé avec success"));
+	}
+	
+	@DeleteMapping("delete-credit-immo/{idCredit}")
+	@ResponseBody
+	public ResponseEntity<Object> deleteCreditImmo(@PathVariable("idCredit") Long idCredit){
+		Optional<Credit> creditOptional = creditRepo.findById(idCredit);
+		
+		if(!creditOptional.isPresent()) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Le credit n'existe pas!"));
+		}
+
+		creditRepo.deleteById(idCredit);
+		
+		return ResponseEntity.ok().body(new MessageResponse("Le credit a été annulé!"));
 	}
 	
 	@PutMapping("/upload/{idCred}")
@@ -276,4 +294,58 @@ public class CreditController {
 	    return ResponseEntity.ok()
 	        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
 	  }
+	
+	@GetMapping("get-stats-date/{date_deb}/{date_fin}")
+	@ResponseBody
+	public ResponseEntity<Object> getStatsDate(@PathVariable("date_deb") String dateDeb,@PathVariable("date_fin") String dateFin){
+		
+		Date dateD = null;
+		try {
+			dateD = new SimpleDateFormat("yyyy-MM-dd").parse(dateDeb);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		Date dateF = null;
+		try {
+			dateF = new SimpleDateFormat("yyyy-MM-dd").parse(dateFin);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		if(dateD == null || dateFin == null) {
+			return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(new MessageResponse("Une erreur s'est produite Veuillez ressayer!"));
+		}
+		
+		if(dateD.compareTo(dateF) > 0) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("La date de debut doit etre avant la date de fin"));
+		}
+		return ResponseEntity.ok().body(creditRepo.getStatsDateAjout(dateD,dateF));
+	}
+	
+	@GetMapping("get-stats-nombre/{date_deb}/{date_fin}")
+	@ResponseBody
+	public ResponseEntity<Object> getStatsNombre(@PathVariable("date_deb") String dateDeb,@PathVariable("date_fin") String dateFin){
+		
+		Date dateD = null;
+		try {
+			dateD = new SimpleDateFormat("yyyy-MM-dd").parse(dateDeb);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		Date dateF = null;
+		try {
+			dateF = new SimpleDateFormat("yyyy-MM-dd").parse(dateFin);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		if(dateD == null || dateFin == null) {
+			return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(new MessageResponse("Une erreur s'est produite Veuillez ressayer!"));
+		}
+		
+		if(dateD.compareTo(dateF) > 0) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("La date de debut doit etre avant la date de fin"));
+		}
+		return ResponseEntity.ok().body(creditRepo.getStatsNombre(dateD,dateF));
+	}
 }

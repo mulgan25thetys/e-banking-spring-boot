@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +34,13 @@ public class PaiementController {
 	@GetMapping("find-all")
 	@ResponseBody
 	public List<PaiementCredit> findAll(){
-		return paiementRepo.findAll();
+		return paiementRepo.findAllGroupByMensuality();
+	}
+	
+	@GetMapping("find-all-by-credit/{id}")
+	@ResponseBody
+	public List<PaiementCredit> findAllByCredit(@PathVariable("id") Long id){
+		return paiementRepo.findAllByCredit(id);
 	}
 }
 

@@ -38,9 +38,12 @@ public class Notification implements Serializable{
 	private String message;
 	private Boolean byMail;
 	private Boolean inInternal;
+	private Boolean isView;
+	private Boolean isShowed;
 	private Boolean sended;
 	@Temporal(TemporalType.DATE)
 	private Date dateNotification;
+	
 	
 	public Long getId() {
 		return id;
@@ -100,6 +103,10 @@ public class Notification implements Serializable{
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public Notification() {
+		super();
 	}
 	
 	
