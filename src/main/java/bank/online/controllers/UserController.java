@@ -1,6 +1,7 @@
 package bank.online.controllers;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import javax.validation.Valid;
@@ -60,14 +61,14 @@ public class UserController {
 		
 	}
 	
-	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE','ROLE_GESTIONNAIRE_PATRIMOINE')")
+	
 	@GetMapping("/list-all-clients")
 	@ResponseBody
 	public List<User> findAllClients() {
 		return userRepository.findAllClients();
 	}
 	
-	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH')")
+	
 	@GetMapping("/list-all-personnals")
 	@ResponseBody
 	public List<User> findAllPersonnals() {
@@ -75,10 +76,6 @@ public class UserController {
 	}
 
 	
-	@SuppressWarnings("all")
-	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH',"
-			+ "'ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
-			+ "'ROLE_DIRECTEUR_FINANCIER','ROLE_GESTIONNAIRE_PATRIMOINE','ROLE_DECIDEUR','ROLE_CONTROLEUR_GESTION','ROLE_EMPLOYE_CAP','ROLE_CLIENT')")
 	@PutMapping("/edit-user")
 	@ResponseBody
 	public ResponseEntity<Object> editUser(@Valid @RequestBody User usr)
@@ -105,9 +102,7 @@ public class UserController {
 		return ResponseEntity.ok().body(userService.editUser(usr));
 	}
 	
-	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH',"
-			+ "'ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
-			+ "'ROLE_PERSONNEL_FINANCIER','ROLE_EMPLOYE_CAP','ROLE_CLIENT')")
+	
 	@PutMapping("/edit-profile/{id}")
 	@ResponseBody
 	public User editProfile(@RequestParam("profile") MultipartFile profile,@PathVariable("id") Long id)
@@ -115,9 +110,7 @@ public class UserController {
 		return userService.editProfile(profile,id);
 	}
 	
-	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH',"
-			+ "'ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
-			+ "'ROLE_PERSONNEL_FINANCIER','ROLE_EMPLOYE_CAP','ROLE_CLIENT')")
+	
 	@GetMapping("/get-user/{id}")
 	@ResponseBody
 	public ResponseEntity<Object> getUser(@PathVariable("id") Long id) {
@@ -128,18 +121,20 @@ public class UserController {
 		return ResponseEntity.ok().body(userService.getUser(id));
 	}
 	
-	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH',"
-			+ "'ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
-			+ "'ROLE_PERSONNEL_FINANCIER','ROLE_EMPLOYE_CAP','ROLE_CLIENT')")
+	
 	@GetMapping("/get-profile/{filename}")
 	@ResponseBody
 	public MessageResponse getProfile(@PathVariable("filename") String filename) {
 		return new MessageResponse(userService.getProfile(filename));
 	}
 	
-	@PreAuthorize("hasAnyRole('ROLE_MEMBRE_DIRECTOIRE','ROLE_PERSONNEL_RH',"
-			+ "'ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
-			+ "'ROLE_PERSONNEL_FINANCIER','ROLE_EMPLOYE_CAP','ROLE_CLIENT')")
+	@GetMapping("/get-available-agent")
+	@ResponseBody
+	public User geAvailableAgent() {
+		return userRepository.getAvailableAgent();
+	}
+	
+	
 	@PutMapping("/change-password/{id}")
 	@ResponseBody
 	public User changePassword(@PathVariable("id") Long id,@RequestBody LoginRequest req)
@@ -167,6 +162,22 @@ public class UserController {
 		
 		//u.setPassword(encoder.encode(this.generateRandomString()));
 		return ResponseEntity.ok().body(userService.addUser(u));
+	}
+	
+	@PutMapping("set-is-available/{code}/{idUser}")
+	@ResponseBody
+	public ResponseEntity<Object> setIsAvailable(@PathVariable("code") int code,@PathVariable("idUser") Long id){
+		Optional<User> userOptional = userRepository.findById(id);
+		if(userOptional.isPresent()) {
+			User user = userOptional.get();
+			if(code == 0) {
+				user.setEstDisponible(false);
+			}else {
+				user.setEstDisponible(true);
+			}
+			return ResponseEntity.ok().body(userRepository.save(user));
+		}
+		return null;
 	}
 	
 	private String generateRandomString() {

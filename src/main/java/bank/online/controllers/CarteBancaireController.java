@@ -76,10 +76,15 @@ public class CarteBancaireController {
 			return ResponseEntity.badRequest().body(new MessageResponse("Nous ne pouvons retrouver cette carte bancaire"));
 		}
 		
+		
 		Optional<CarteBancaire> optCard = carteRepo.findById(id);
 		String cardDetail = "";
 		if(optCard.isPresent()) {
 			cardDetail = optCard.get().getTypeCarte().getNom()+ " de numero: "+optCard.get().getNumero();
+		}
+		
+		if(Boolean.TRUE.equals(optCard.get().getEstSoucrite())) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Cette carte bancaire est en cours d'utilisation"));
 		}
 		carteServices.removeCarte(optCard.get().getIdCarteB());
 		return ResponseEntity.ok().body(new MessageResponse("Un carte bancaire "+cardDetail+" a été supprimée"));

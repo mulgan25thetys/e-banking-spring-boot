@@ -14,7 +14,7 @@ import bank.online.entities.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 	Optional<User> findByUsername(String username);
 	
-	@Query(value = "SELECT * FROM user WHERE email =:value OR username=:value",nativeQuery = true)
+	@Query(value = "SELECT * FROM user WHERE email =:value OR username=:value LIMIT 1",nativeQuery = true)
 	User findByUsernameOrEmail(@Param("value") String value);
 	
 	@Query(value = "SELECT * FROM user u INNER JOIN role r on u.role_id = r.id "
@@ -22,6 +22,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 			+ "'ROLE_GESTIONNAIRE_PATRIMOINE','ROLE_CHARGE_ETUDE','ROLE_CONTROLEUR_GESTION'"
 			+ ",'ROLE_PERSONNEL_RH') ORDER BY date_creation DESC",nativeQuery = true)
 	List<User> findAllPersonnals();
+	
+	@Query(value = "SELECT * FROM user u INNER JOIN role r on u.role_id = r.id "
+			+ "WHERE r.name IN ('ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
+			+ "'ROLE_GESTIONNAIRE_PATRIMOINE') AND u.est_disponible=1 LIMIT 1",nativeQuery = true)
+	User getAvailableAgent();
 	
 	@Query(value = "SELECT * FROM user u INNER JOIN role r on u.role_id = r.id "
 			+ "WHERE r.name IN ('ROLE_GESTIONNAIRE_CLIENTELE','ROLE_CONSEILLER_CLIENTELE',"
