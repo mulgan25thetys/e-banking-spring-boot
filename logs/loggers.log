@@ -108,3 +108,15 @@
 2023-01-19 10:43:10 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
 2023-01-19 10:43:17 bank.online.controllers.AuthController.confirmation(AuthController.java:267):267 - org.springframework.dao.IncorrectResultSizeDataAccessException: query did not return a unique result: 2; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 2
 2023-01-19 11:05:48 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2023-01-20 06:20:54 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2023-01-20 06:20:54 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2023-01-20 06:20:54 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2023-01-20 06:20:54 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2023-01-20 06:21:07 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2023-01-20 06:21:07 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2023-01-20 06:21:07 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2023-01-20 06:21:07 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2023-01-20 06:25:26 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2023-01-20 06:25:26 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2023-01-20 06:25:26 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource
+2023-01-20 06:25:26 bank.online.security.jwt.AuthEntryPointJwt.commence(AuthEntryPointJwt.java:18):18 - Unauthorized error: {} Full authentication is required to access this resource

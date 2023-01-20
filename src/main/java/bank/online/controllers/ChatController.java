@@ -1,9 +1,8 @@
 package bank.online.controllers;
 
-import java.util.Random;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +15,7 @@ import bank.online.entities.Chat;
 import bank.online.repositories.ChatRepository;
 import bank.online.repositories.UserRepository;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("chats")
 public class ChatController {
@@ -37,13 +37,6 @@ public class ChatController {
 	@ResponseBody
 	public Chat addUserMessage(@RequestBody Chat chat) {
 		return chatRepo.save(chat);
-	}
-	
-	@GetMapping("test")
-	@ResponseBody
-	public ResponseEntity<Object> test(){
-		Random rand = new Random();
-		return ResponseEntity.ok().body(rand.nextLong(1000000000));
 	}
 }
 
